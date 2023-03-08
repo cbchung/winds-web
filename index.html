@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Doorbot</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+        <script src="/tools/sejak.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"/>
+        <link rel="stylesheet" href="/res/common.css">
+        <link rel="stylesheet" href="/res/app.css">
+        <link rel="stylesheet" href="/res/animate.css">
+        <style>
+            body > div.cb > div.loading-cont { display:flex; position: fixed; top:0; left:0; width: 100vw; height:100vh; align-items: center; justify-content: center; background-color:cadetblue; font-size:18pt; }
+            body > div.cb > div.loading-cont > span { color: white; font-weight: 800; font-size: 24pt; }
+            body > div.overlays { display:none; position:fixed; top:0; left:0; right:0; bottom:0; align-items:center; justify-content: center;}
+            body > div.overlays.on { display:flex; }
+            section.page { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display:flex; flex-direction: column; }
+        </style>
+    </head>
+    <body>
+        <div class="cb">
+            <div class="loading-cont"><span>Doorbot</span></div>
+        </div>
+        <div class="overlays" id="layout-dialog-wrapper"><div id="layout-dialog"></div></div>
+        <script>
+            window.addEventListener('DOMContentLoaded', function(){
+                setTimeout(() => { app.setPage('main.html'); window.ReactNativeWebView.postMessage("loaded"); }, 2000);
+            });
+            let app = {
+                setPage : function(url, param, cb){ 
+                    sejak.setFrag('body > div.cb', '/pages/'+url, param, cb); 
+                },
+                openDialog : function(url, param, cb){
+                    try{ document.getElementById('layout-dialog').style.width = param.size + 'px'; }catch(e){}
+                    app.dialogParam = param;
+                    sejak.setFrag('#layout-dialog', '/dialog/'+url, param, function(res){
+                        document.getElementById('layout-dialog-wrapper').classList.add('on');
+                        if(typeof cb === 'function') cb(res);
+                    });
+                },
+                closeDialog : function(){ document.getElementById('layout-dialog-wrapper').classList.remove('on') },
+                nav : function(el){
+                    const link = el.dataset.link;
+                    document.querySelectorAll('ul.nav > li').forEach(function(e){
+                        if(e == el) e.classList.add("on");
+                        else e.classList.remove("on");
+                    });
+                    app.setPage(`${link}.html`);
+                }
+            };
+        </script>
+    </body>
+</html>

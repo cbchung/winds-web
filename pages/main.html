@@ -1,0 +1,42 @@
+<sejak version="1.0">
+    <section class="page" data-id="page-frags">
+        <style>
+            $s > div.ib { display: flex; justify-content: center; padding: 10px; background-color: azure; font-size: 10pt; }
+            $s > main { flex:1; overflow: auto; display:flex; flex-direction:column; padding: 10px; }
+            $s > main > ul.cmds { display:flex; justify-content: end; }
+
+            $s > main > ul.cmds > li { background-color:indianred; color:white; border-radius: 50%; display:flex; align-items: center; justify-content: center; width:48px; height:48px; margin-left:10px; }
+            $s > main > ul.cmds > li:hover { background-color:darkred; box-shadow: 5px 5px 10px; }
+            $s > main > ul.cmds > li > span.rbtn { font-size:8pt; }
+
+        </style>
+        <div class="ib"><span>Doorbot</span></div>
+        <main>
+            <ul class="cmds">
+                <li><span class="rbtn" onclick="$h.showContent('voice')">음성<br>제어</span></li>
+                <li><span class="rbtn" onclick="$h.showContent('window')">창문<br>제어</span></li>
+                <li><span class="rbtn" onclick="$h.showContent('setting')">설정</span></li>
+            </ul>
+            <ul class="windows-status"></ul>
+            <ul class="info-states"></ul>
+            <div class="gagues">
+                <div class="inner"></div>
+                <div class="outter"></div>
+            </div>
+        </main>
+    </section>
+    <script>
+        return {
+            onload : function(p){
+                console.log(p);
+                web2_native({n:'name', p:'test direct message'});
+            },
+            onextract : function(){
+            },
+            showContent : function(id){
+                console.log('showContent', id);
+                app.openDialog(`${id}.html`);
+            }
+        }
+    </script>
+</sejak>

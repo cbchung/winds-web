@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+/*
+ * globals
+ */
+:root {
+  --main-text : #626262;
+  --accent-text : #555555;
+  --background-menu : #EFEFF4;
+  --background-content : #F6F6F9;
+  --key-color : #0000B7;
+  --sub-color : #FFFA99;
+  --admin : #46cc8c;
+} 
+textarea  { resize: none; }
+
+/*
+ * layout format
+ */
+body  { margin:0; padding: 0; font-family: 'Noto Sans KR', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+
+@media screen and (min-width: 1025px){
+}
+@media screen and (max-width: 1024px){
+}
+
