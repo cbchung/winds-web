@@ -8,7 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: pwd
-      - run: mkdir /opt/htdocs/doorbot || true
       - run: ls -al
       - run: cp -r ./* /opt/htdocs/doorbot
 
