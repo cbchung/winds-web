@@ -11,6 +11,6 @@ jobs:
       - run: ls -al
       - run: cat ./deploy.sh
       - run: git update-index --chmod=+x ./deploy.sh
-      - run: ./deploy.sh
+      - run: bash ./deploy.sh
 
           
