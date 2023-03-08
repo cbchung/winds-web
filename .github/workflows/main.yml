@@ -6,6 +6,7 @@ jobs:
   deploy :
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - run: pwd
       - run: mkdir /opt/htdocs/doorbot || true
       - run: cp -r ./* /opt/htdocs/doorbot
