@@ -6,6 +6,8 @@ jobs:
   deploy :
     runs-on: ubuntu-latest
     steps:
+      - env: 
+        GITHUB_WORKSPACE: /opt/github
       - uses: actions/checkout@v3
       - run: pwd
       - run: ls -al
