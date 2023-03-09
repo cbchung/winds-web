@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
         <script src="/tools/sejak.js"></script>
+        <script src="/tools/mobile.js"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"/>
         <link rel="stylesheet" href="/res/common.css">
         <link rel="stylesheet" href="/res/app.css">
@@ -26,7 +27,7 @@
         <div class="overlays" id="layout-dialog-wrapper"><div id="layout-dialog"></div></div>
         <script>
             window.addEventListener('DOMContentLoaded', function(){
-                setTimeout(() => { app.setPage('main.html'); if(window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ x:'111', callback:'app.native.cb'})); }, 2000);
+                setTimeout(() => { app.setPage('main.html'); navigate.init(); }, 2000);
             });
             let app = {
                 setPage : function(url, param, cb){ 
@@ -49,14 +50,11 @@
                     });
                     app.setPage(`${link}.html`);
                 },
-                native : {
-                        test : function(msg){
-                                console.log('native.test', msg);
-                        },
-                        cb: function(msg){
-                                alert(msg);
-                                console.log('native.cb', msg);
-                        }
+                mobile : {
+                    // navigate.init()
+                    onAppLoaded : function(params){ 
+                        console.log('onAppLoaded', params);
+                    }
                 }
             };
         </script>
