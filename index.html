@@ -26,7 +26,7 @@
         <div class="overlays" id="layout-dialog-wrapper"><div id="layout-dialog"></div></div>
         <script>
             window.addEventListener('DOMContentLoaded', function(){
-                setTimeout(() => { app.setPage('main.html'); window.ReactNativeWebView.postMessage("loaded"); }, 2000);
+                setTimeout(() => { app.setPage('main.html'); if(window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify({ x:'111', callback:'app.native.cb'})); }, 2000);
             });
             let app = {
                 setPage : function(url, param, cb){ 
@@ -48,6 +48,15 @@
                         else e.classList.remove("on");
                     });
                     app.setPage(`${link}.html`);
+                },
+                native : {
+                        test : function(msg){
+                                console.log('native.test', msg);
+                        },
+                        cb: function(msg){
+                                alert(msg);
+                                console.log('native.cb', msg);
+                        }
                 }
             };
         </script>
