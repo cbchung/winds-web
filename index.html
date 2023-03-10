@@ -50,10 +50,17 @@
                     });
                     app.setPage(`${link}.html`);
                 },
+                // App이 Android나 iOS가 아닌곳에서 요청되었을때 호출됨.
                 mobile : {
                     // navigate.init()
                     onAppLoaded : function(params){ 
                         console.log('onAppLoaded', params);
+                    },
+                    speak : function(params){
+                        console.log('speak', params);
+                    },
+                    speach: function(params){
+                        console.log('speach', params);
                     }
                 }
             };

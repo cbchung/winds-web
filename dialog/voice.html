@@ -11,6 +11,9 @@
             $s > main > div.wave-wrap > div.ocean > div.wave { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23003F7C'/%3E%3C/svg%3E"); position: absolute; width: 200%; height: 100%; animation: wave 5s -3s linear infinite; transform: translate3d(0, 0, 0); opacity: 0.1; }
             $s > main > div.wave-wrap > div.ocean > div.wave:nth-of-type(2) { bottom: 0; animation: wave 10s linear reverse infinite; opacity: 0.2; }
             $s > main > div.wave-wrap > div.ocean > div.wave:nth-of-type(3) { bottom: 0; animation: wave 13s -1s linear infinite; opacity: 0.1; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave { animation: none; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave:nth-of-type(2) { animation: none; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave:nth-of-type(3) { animation: none; }
             @keyframes wave { 0% {transform: translateX(0);} 50% {transform: translateX(-25%);} 100% {transform: translateX(-50%);} }
 
             $s > main > div.reconized { min-height: 18pt; font-size:16pt; display:flex; justify-content: center; margin-bottom: 50px; }
@@ -19,16 +22,18 @@
         </style>
         <div class="ib"><span>음성제어</span><span class="exit material-icons" onclick="app.closeDialog()">close</span></div>
         <main>
+            <div class="tools">
+            </div>
             <div class="wave-wrap">
-                <div class="ocean">
+                <div class="ocean stop">
                     <div class="wave"></div>
                     <div class="wave"></div>
                     <div class="wave"></div>
                 </div>
-                <img src="/images/mic.jpg">
+                <img src="/images/mic.jpg" onclick="$h.toggle()">
             </div>
-            <div class="reconized">인식된 메시지-1</div>
-            <div class="message">처리를 알리는 메시지</div>
+            <div class="reconized"></div>
+            <div class="message"></div>
         </main>
     </section>
     <script>
@@ -36,8 +41,124 @@
         return {
             onload : function(p){
                 console.log('dialog-voice');
+                this.initSpeech();
+                $v.addEventListener('speech', $this.speechListener, false);
             },
             onextract : function(){
+                this.exitSpeech();
+                $v.removeEventListener('speech', $this.speechListener, false);
+            },
+            speechListener: function(e){
+                console.log('speechListener', e, e.detail.data);
+                const res = e.detail.data;
+                
+                const oc = $v.querySelector('div.ocean');
+                oc.classList.add('stop');
+                $sejak($id).stopSpeech();
+
+                const results = res.split(',');
+                const rc = $this.findCommand(results);
+                if(rc == null){
+                    $sejak($id).talkto("죄송합니다. 다시말씀해 주세요.");
+                    setTimeout(function(){ $sejak($id).startSpeech(); }, 3000);
+                }
+                else{
+                    switch(rc){
+                        case 'openDoor' : 
+                            $sejak($id).talkto("네, 문을 열겠습니다.");
+                            break;
+                        case 'closeDoor' : 
+                            $sejak($id).talkto("네, 문을 닫겠습니다.");
+                            break;
+                        case 'stopDoor' : 
+                            $sejak($id).talkto("네, 동작을 정지합니다.");
+                            break;
+                        case 'openLeftDoor' : 
+                            $sejak($id).talkto("네, 왼쪽 문을 열겠습니다.");
+                            break;
+                        case 'closeLeftDoor' : 
+                            $sejak($id).talkto("네, 왼쪽 문을 닫겠습니다.");
+                            break;
+                        case 'openRightDoor' : 
+                            $sejak($id).talkto("네, 오른쪽 문을 열겠습니다.");
+                            break;
+                        case 'closeRightDoor' : 
+                            $sejak($id).talkto("네, 오른쪽 문을 닫겠습니다.");
+                            break;
+                        default : 
+                            break;
+                    }
+                }
+            },
+            toggle : function(){
+                const oc = $v.querySelector('div.ocean');
+                if(oc.classList.contains('stop')){
+                    oc.classList.remove('stop');
+                    // $sejak($id).talkto("말씀하세요. 듣고있습니다!");
+                    $sejak($id).startSpeech();
+                } 
+                else {
+                    oc.classList.add('stop');
+                    $sejak($id).stopSpeech();
+                } 
+            },
+            initSpeech : function(){
+                //navigate.callNative('speech', { cmd: 'open' });
+                navigate.addInvoker($v);
+                $this.talkto('안녕하세요 도어봇입니다. 마이크를 클릭해서 말씀하세요.');
+                $this.initCommandBase();
+            },
+            startSpeech : function(){
+                navigate.callNative('speech', { cmd: 'on' });
+            },
+            stopSpeech : function(){
+                navigate.callNative('speech', { cmd: 'off' });
+            },
+            exitSpeech : function(){
+                //navigate.callNative('speech', { cmd: 'close' });
+                navigate.removeInvoker($v);
+            },
+            talkto : function(msg){
+                navigate.callNative('speak', { msg:msg, utterid: 'doorbot' });
+            },
+            initCommandBase : function(){
+                $this.commands = [
+                    'openDoor', 'closeDoor', 'stopDoor', 
+                    'openLeftDoor', 'closeLeftDoor',
+                    'openRightDoor', 'closeRightDoor'
+                ];
+
+                $this.tokens = {};
+                $this.tokens['open'] = ['열어','여러'];
+                $this.tokens['close'] = ['닫아','닫어'];
+                $this.tokens['stop'] = ['정지','멈춰','스톱','스탑','그만'];
+                $this.tokens['left'] = ['왼쪽'];
+                $this.tokens['right'] = ['오른쪽'];
+            },
+            findCommand : function(rlts){
+
+                for(const candi of rlts){
+                    console.log('findCommand with ', candi);
+
+                    // 열어 or 닫아 판단
+                    let isOpen = null;
+                    for(const t of $this.tokens.open) if(candi.includes(t)){ isOpen = true; break; }
+                    if(isOpen == null) for(const t of $this.tokens.close) if(candi.includes(t)){ isOpen = false; break; }
+                    if(isOpen == null) {
+                        for(const t of $this.tokens.stop) if(candi.includes(t)){ return 'stopDoor'; }
+                        continue; 
+                    };
+                    
+                    // 왼쪽 or 오른쪽 판단
+                    for(const t of $this.tokens.left) if(candi.includes(t)){ return isOpen ? 'openLeftDoor' : 'closeLeftDoor' }
+                    for(const t of $this.tokens.right) if(candi.includes(t)){ return isOpen ? 'openRightDoor' : 'closeRightDoor' }
+                    
+                    if(isOpen == null) continue;
+                    if(isOpen) return 'openDoor';
+                    else return 'closeDoor';   
+                }
+
+                return null; // unknown cmd
             }
         }
     </script>

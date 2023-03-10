@@ -1,0 +1,164 @@
+<sejak version="1.0">
+    <section class="dialog" data-id="page-frags">
+        <style>
+            $s { position: fixed; top:0; left:0; width:100vw; height: 100vh; display: flex; flex-direction: column; background-color: white; }
+            $s > div.ib { display: flex; justify-content: center; padding: 10px; background-color: azure; font-size: 10pt; position:relative; }
+            $s > div.ib > span.exit { position:absolute; right:10px; top:10px; }
+            $s > main { flex:1; overflow: auto; display:flex; flex-direction:column; padding: 10px; }
+            $s > main > div.wave-wrap { flex:1; display:flex; align-items: center; justify-content: center; position:relative; }
+            $s > main > div.wave-wrap > img { width: 30%; }
+            $s > main > div.wave-wrap > div.ocean { overflow-x: hidden; height: 50px; width:100%; position:absolute; margin-top: 80px; }
+            $s > main > div.wave-wrap > div.ocean > div.wave { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 88.7'%3E%3Cpath d='M800 56.9c-155.5 0-204.9-50-405.5-49.9-200 0-250 49.9-394.5 49.9v31.8h800v-.2-31.6z' fill='%23003F7C'/%3E%3C/svg%3E"); position: absolute; width: 200%; height: 100%; animation: wave 5s -3s linear infinite; transform: translate3d(0, 0, 0); opacity: 0.1; }
+            $s > main > div.wave-wrap > div.ocean > div.wave:nth-of-type(2) { bottom: 0; animation: wave 10s linear reverse infinite; opacity: 0.2; }
+            $s > main > div.wave-wrap > div.ocean > div.wave:nth-of-type(3) { bottom: 0; animation: wave 13s -1s linear infinite; opacity: 0.1; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave { animation: none; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave:nth-of-type(2) { animation: none; }
+            $s > main > div.wave-wrap > div.ocean.stop > div.wave:nth-of-type(3) { animation: none; }
+            @keyframes wave { 0% {transform: translateX(0);} 50% {transform: translateX(-25%);} 100% {transform: translateX(-50%);} }
+
+            $s > main > div.reconized { min-height: 18pt; font-size:16pt; display:flex; justify-content: center; margin-bottom: 50px; }
+            $s > main > div.message { padding: 10px; font-size:10pt; display:flex; justify-content: center; background-color: lightgrey; }
+
+        </style>
+        <div class="ib"><span>음성제어</span><span class="exit material-icons" onclick="app.closeDialog()">close</span></div>
+        <main>
+            <div class="tools">
+                <select class="voice"></select>
+            </div>
+            <div class="wave-wrap">
+                <div class="ocean stop">
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                <img src="/images/mic.jpg" onclick="$h.toggle()">
+            </div>
+            <div class="reconized">인식된 메시지-1</div>
+            <div class="message">처리를 알리는 메시지</div>
+        </main>
+    </section>
+    <script>
+
+        return {
+            onload : function(p){
+                console.log('dialog-voice');
+                this.initSpeech();
+            },
+            onextract : function(){
+                this.exitSpeech();
+            },
+            toggle : function(){
+                const oc = $v.querySelector('div.ocean');
+                if(oc.classList.contains('stop')){
+                    oc.classList.remove('stop');
+                    $sejak($id).startSpeech();
+                    $sejak($id).talkto("말씀하세요. 듣고있습니다!");
+                } 
+                else {
+                    oc.classList.add('stop');
+                    $sejak($id).stopSpeech();
+                } 
+            },
+            initSpeech : function(){
+                const SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+                const SpeechGrammarList = window.SpeechGrammarList || webkitSpeechGrammarList;
+                const SpeechRecognitionEvent = window.SpeechRecognitionEvent || webkitSpeechRecognitionEvent;
+
+                const messages = [
+                    "하나", "둘", "셋", "넷",
+                    "디비야", "문열어", "문닫아", "반만닫아", "왼쪽 문 닫아", "오른쪽 문 닫아", "왼쪽문닫아", "오른쪽문닫아"
+                ];
+                const grammar = `#JSGF V1.0; grammar colors; public <doorbot> = ${messages.join(' | ')};`;
+                const speechRecognitionList = new SpeechGrammarList();
+                speechRecognitionList.addFromString(grammar, 1);
+
+                this.recognition = new SpeechRecognition();
+                this.recognition.grammars = speechRecognitionList;
+                this.recognition.continuous = false;
+                this.recognition.lang = 'ko-KR';
+                this.recognition.interimResults = false;
+                this.recognition.maxAlternatives = 1;
+
+                //
+                this.synth = window.speechSynthesis;
+                this.populateVoiceList();
+                
+                if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = this.populateVoiceList;
+                $sejak($id).talkto("안녕하세요!.");
+            },
+            populateVoiceList : function(){
+                const voiceSelect = $v.querySelector("select.voice");
+                $this.voices = $this.synth.getVoices();
+                console.log('voices', $this.voices);
+                for (const voice of $this.voices) {
+                    const option = document.createElement('option');
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.default) {
+                        option.textContent += ' — DEFAULT';
+                    }
+                    option.setAttribute('data-lang', voice.lang);
+                    option.setAttribute('data-name', voice.name);
+                    voiceSelect.appendChild(option);
+                }
+            },
+            startSpeech : function(){
+                const message = $v.querySelector('div.message');
+
+                this.recognition.onresult = (event) => {
+                    const msg = event.results[0][0].transcript;
+                    message.innerHTML = `Result received: ${msg}.`;
+                    $v.queryselector('div.reconized').innerHTML = msg;
+                    console.log(`Confidence: ${event.results[0][0].confidence}`);
+
+                    $this.talkto("네!!, 문을 열겠습니다.");
+                }
+                this.recognition.onspeechend = (event) => {
+                    console.log('ononspeechend');
+                }
+                this.recognition.onnomatch = (event) => {
+                    message.innerHTML = "I didn't recognize that it.";
+                }
+                this.recognition.onerror = (event) => {
+                    message.innerHTML = `Error occurred in recognition: ${event.error}`;
+                }
+
+                this.recognition.start();
+                console.log('Ready to receive a color command.');
+            },
+            stopSpeech : function(){
+                this.recognition.stop();
+            },
+            exitSpeech : function(){
+                this.recognition.stop();
+            },
+            talkto : function(msg){
+                console.log('talkto..');
+                if ($this.synth.speaking) {
+                    console.error("speechSynthesis.speaking");
+                    return;
+                }
+
+                const voiceSelect=$v.querySelector(select.voice), utterThis = new SpeechSynthesisUtterance(msg);
+                const selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+                for (const voice of $this.voices) {
+                    if (voice.name === selectedOption) utterThis.voice = voice;
+                }
+                console.log('talkto..voice:', utterThis.voice.name);
+                utterThis.pitch = 1;
+                utterThis.rate = 1;
+                utterThis.onpause = (event) => {
+                    const char = event.utterance.text.charAt(event.charIndex);
+                    console.log( `Speech paused at character ${event.charIndex} of "${event.utterance.text}", which is "${char}".` );
+                }
+                utterThis.onend = function (event) {
+                    console.log("SpeechSynthesisUtterance.onend");
+                };
+                utterThis.onerror = function (event) {
+                    console.error("SpeechSynthesisUtterance.onerror");
+                };
+                console.log('talkto..voice:speak', msg);
+                $this.synth.speak(utterThis);
+            }
+        }
+    </script>
+</sejak>

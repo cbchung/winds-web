@@ -5,9 +5,9 @@
             $s > main { flex:1; overflow: auto; display:flex; flex-direction:column; padding: 10px; }
             $s > main > ul.cmds { display:flex; justify-content: end; }
 
-            $s > main > ul.cmds > li { background-color:indianred; color:white; border-radius: 50%; display:flex; align-items: center; justify-content: center; width:48px; height:48px; margin-left:10px; }
+            $s > main > ul.cmds > li { background-color:indianred; color:white; border-radius: 50%; display:flex; align-items: center; justify-content: center; width:56px; height:56px; margin-left:10px; }
             $s > main > ul.cmds > li:hover { background-color:darkred; box-shadow: 5px 5px 10px; }
-            $s > main > ul.cmds > li > span.rbtn { font-size:8pt; }
+            $s > main > ul.cmds > li > span.rbtn { font-size:10pt; }
 
         </style>
         <div class="ib"><span>Doorbot</span></div>
@@ -29,14 +29,15 @@
         return {
             onload : function(p){
                 console.log(p);
-                web2_native({n:'name', p:'test direct message'});
             },
             onextract : function(){
+                
             },
             showContent : function(id){
                 console.log('showContent', id);
                 app.openDialog(`${id}.html`);
-            }
+            },
+
         }
     </script>
 </sejak>
