@@ -5,10 +5,13 @@
             $s > main { flex:1; overflow: auto; display:flex; flex-direction:column; padding: 10px; }
             $s > main > ul.cmds { display:flex; justify-content: end; }
 
-            $s > main > ul.cmds > li { background-color:indianred; color:white; border-radius: 50%; display:flex; align-items: center; justify-content: center; width:56px; height:56px; margin-left:10px; }
+            $s > main > ul.cmds > li { background-color:indianred; color:white; border-radius: 50%; display:flex; align-items: center; justify-content: center; width:56px; height:56px; margin-left:10px; padding: 5px; }
             $s > main > ul.cmds > li:hover { background-color:darkred; box-shadow: 5px 5px 10px; }
             $s > main > ul.cmds > li > span.rbtn { font-size:10pt; }
 
+            $s > main > ul.windows-status { background-color: rgba(100,100,100,.1); min-height: 200px; margin: 10px 0; border-radius: 5px; }
+            $s > main > ul.info-states { background-color: rgba(100,100,100,.1); min-height: 80px; display: flex; border-radius: 5px; }
+            $s > main > div.gagues { background-color: rgba(100,100,100,.1); min-height: 100px; display: flex; border-radius: 5px; margin-top: 10px; flex: 1; }
         </style>
         <div class="ib"><span>Doorbot</span></div>
         <main>
