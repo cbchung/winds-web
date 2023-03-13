@@ -33,7 +33,7 @@
                 </div>
                 <img src="/images/mic.jpg" onclick="$h.toggle()">
             </div>
-            <div class="reconized">인식된 메시지-1</div>
+            <div class="reconized">인식된 메시지</div>
             <div class="message">처리를 알리는 메시지</div>
         </main>
     </section>
