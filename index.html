@@ -64,6 +64,11 @@
                     }
                 }
             };
+
+            const doorbot = new Worker('/tools/doorbot.js');
+            doorbot.onmessage = (e) => {
+                console.log('doorbot.onmessage', e.data);
+            }
         </script>
     </body>
 </html>
